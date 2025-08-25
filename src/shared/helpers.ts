@@ -33,3 +33,7 @@ export const getOrderIdByPaymentInfo = (orderInfo: string) => {
 export const generateCancelOrderJobId = (orderId: number) => {
   return `order-${orderId}`
 }
+
+export const generateRoomUserId = (userId: number) => {
+  return `user-${userId}`
+}

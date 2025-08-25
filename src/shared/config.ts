@@ -39,7 +39,8 @@ const configSchema = z.object({
   MOMO_SECRET_KEY: z.string(),
   MOMO_REDIRECT_URL: z.string(),
   ORDER_CANCEL_AFTER: z.string(),
-  REDIS_URL: z.string()
+  REDIS_URL: z.string(),
+  SOCKET_IO_PORT: z.string()
 })
 
 const parsedConfig = configSchema.safeParse(process.env)

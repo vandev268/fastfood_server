@@ -32,6 +32,9 @@ import { ScheduleModule } from '@nestjs/schedule'
 import { BullModule } from '@nestjs/bullmq'
 import envConfig from './shared/config'
 import { OrderConsumer } from './consumers/order.consumer'
+import { WebsocketModule } from './websockets/websocket.module'
+import { StatisticsModule } from './routes/statistics/statistics.module'
+import { PaymentModule } from './routes/payment/payment.module'
 
 @Module({
   imports: [
@@ -54,6 +57,7 @@ import { OrderConsumer } from './consumers/order.consumer'
     ReservationModule,
     CouponModule,
     OrderModule,
+    PaymentModule,
     ReviewModule,
     ProfileModule,
     ScheduleModule.forRoot(),
@@ -66,7 +70,9 @@ import { OrderConsumer } from './consumers/order.consumer'
         url: envConfig.REDIS_URL
       }
     }),
-    OrderConsumer
+    OrderConsumer,
+    WebsocketModule,
+    StatisticsModule
   ],
   controllers: [AppController],
   providers: [
