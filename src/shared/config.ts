@@ -37,7 +37,9 @@ const configSchema = z.object({
   VNPAY_REDIRECT_URL: z.string(),
   MOMO_ACCESS_KEY: z.string(),
   MOMO_SECRET_KEY: z.string(),
-  MOMO_REDIRECT_URL: z.string()
+  MOMO_REDIRECT_URL: z.string(),
+  ORDER_CANCEL_AFTER: z.string(),
+  REDIS_URL: z.string()
 })
 
 const parsedConfig = configSchema.safeParse(process.env)

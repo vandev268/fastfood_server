@@ -3,6 +3,7 @@ import { Injectable } from '@nestjs/common'
 import { PrismaService } from 'src/shared/services/prisma.service'
 import {
   ChangeOrderStatusBodyType,
+  CreateDeliveryOrderBodyType,
   CreateDeliveryOrderType,
   CreateDineInOrderType,
   CreateOnlineOrderType,
@@ -12,6 +13,8 @@ import {
 } from './order.model'
 import { Prisma } from '@prisma/client'
 import { CartItemDetailType } from 'src/shared/models/shared-cart.model'
+import { PaymentMethod } from 'src/shared/constants/payment.constant'
+import { OrderProducer } from './order.producer'
 import { DraftItemDetailType } from 'src/shared/models/shared-draft-item.model'
 import { TableStatus } from 'src/shared/constants/table.constant'
 import { SharedUserRepo } from 'src/shared/repositories/shared-user.repo'
@@ -21,6 +24,7 @@ import { ReservationStatus } from 'src/shared/constants/reservation.constant'
 export class OrderRepo {
   constructor(
     private readonly prismaService: PrismaService,
+    private readonly orderProducer: OrderProducer,
     private readonly sharedUserRepo: SharedUserRepo
   ) {}
 
@@ -234,6 +238,9 @@ export class OrderRepo {
       }
 
       const [order] = await Promise.all([order$, variants$])
+      if (order.payment.paymentMethod === PaymentMethod.MOMO || order.payment.paymentMethod === PaymentMethod.VNPay) {
+        await this.orderProducer.addCancelOrderJob(order.id)
+      }
       return order
     })
   }
@@ -301,6 +308,9 @@ export class OrderRepo {
         : Promise.resolve(null)
 
       const [order] = await Promise.all([order$, variants$, draftItems$, coupon$])
+      if (order.payment.paymentMethod === PaymentMethod.MOMO || order.payment.paymentMethod === PaymentMethod.VNPay) {
+        await this.orderProducer.addCancelOrderJob(order.id)
+      }
       return order
     })
   }
@@ -388,6 +398,9 @@ export class OrderRepo {
         : Promise.resolve(null)
 
       const [order] = await Promise.all([order$, variants$, draftItems$, coupon$])
+      if (order.payment.paymentMethod === PaymentMethod.MOMO || order.payment.paymentMethod === PaymentMethod.VNPay) {
+        await this.orderProducer.addCancelOrderJob(order.id)
+      }
       return order
     })
   }
@@ -513,6 +526,11 @@ export class OrderRepo {
         : Promise.resolve(null)
 
       const [order] = await Promise.all([order$, variants$, coupon$, reservation$])
+
+      // 5. Add cancel job for non-cash payments
+      if (order.payment.paymentMethod === PaymentMethod.MOMO || order.payment.paymentMethod === PaymentMethod.VNPay) {
+        await this.orderProducer.addCancelOrderJob(order.id)
+      }
 
       return order
     })

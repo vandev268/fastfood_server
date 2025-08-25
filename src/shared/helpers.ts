@@ -29,3 +29,7 @@ export const getOrderIdByPaymentInfo = (orderInfo: string) => {
   const orderId = orderInfo.split('#')[1]
   return Number(orderId)
 }
+
+export const generateCancelOrderJobId = (orderId: number) => {
+  return `order-${orderId}`
+}

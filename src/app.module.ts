@@ -29,6 +29,9 @@ import { ProfileModule } from './routes/profile/profile.module'
 import { RemoveRefreshTokenCronjob } from './cronjobs/remove-refresh-token.cronjob'
 import { RemoveVerificationCodeCronjob } from './cronjobs/remove-verification-code.cronjob'
 import { ScheduleModule } from '@nestjs/schedule'
+import { BullModule } from '@nestjs/bullmq'
+import envConfig from './shared/config'
+import { OrderConsumer } from './consumers/order.consumer'
 
 @Module({
   imports: [
@@ -53,7 +56,17 @@ import { ScheduleModule } from '@nestjs/schedule'
     OrderModule,
     ReviewModule,
     ProfileModule,
-    ScheduleModule.forRoot()
+    ScheduleModule.forRoot(),
+    BullModule.forRoot({
+      connection: {
+        // host: 'redis-18977.c292.ap-southeast-1-1.ec2.redns.redis-cloud.com',
+        // port: 18977,
+        // username: 'default',
+        // password: 'l5L9VD4Qa4sfJDMY2FUjTONs9fITCoxL'
+        url: envConfig.REDIS_URL
+      }
+    }),
+    OrderConsumer
   ],
   controllers: [AppController],
   providers: [
