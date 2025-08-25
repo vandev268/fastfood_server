@@ -13,6 +13,8 @@ import { ProvinceModule } from './routes/province/province.module'
 import { DistrictModule } from './routes/district/district.module'
 import { WardModule } from './routes/ward/ward.module'
 import { AddressModule } from './routes/address/address.module'
+import { MediaModule } from './routes/media/media.module'
+import { UserModule } from './routes/user/user.module'
 
 @Module({
   imports: [
@@ -23,7 +25,9 @@ import { AddressModule } from './routes/address/address.module'
     ProvinceModule,
     DistrictModule,
     WardModule,
-    AddressModule
+    AddressModule,
+    MediaModule,
+    UserModule
   ],
   controllers: [AppController],
   providers: [

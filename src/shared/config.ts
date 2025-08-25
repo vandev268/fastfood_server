@@ -26,7 +26,11 @@ const configSchema = z.object({
   GOOGLE_CLIENT_ID: z.string(),
   GOOGLE_CLIENT_SECRET: z.string(),
   GOOGLE_REDIRECT_URI: z.string(),
-  GOOGLE_CLIENT_REDIRECT_URI: z.string()
+  GOOGLE_CLIENT_REDIRECT_URI: z.string(),
+  AWS_S3_BUCKET_NAME: z.string(),
+  AWS_S3_REGION: z.string(),
+  AWS_S3_ACCESS_KEY_ID: z.string(),
+  AWS_S3_SECRET_KEY: z.string()
 })
 
 const parsedConfig = configSchema.safeParse(process.env)
