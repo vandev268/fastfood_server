@@ -15,6 +15,9 @@ import { WardModule } from './routes/ward/ward.module'
 import { AddressModule } from './routes/address/address.module'
 import { MediaModule } from './routes/media/media.module'
 import { UserModule } from './routes/user/user.module'
+import { ProductModule } from './routes/product/product.module'
+import { CategoryModule } from './routes/category/category.module'
+import { TagModule } from './routes/tag/tag.module'
 
 @Module({
   imports: [
@@ -27,7 +30,10 @@ import { UserModule } from './routes/user/user.module'
     WardModule,
     AddressModule,
     MediaModule,
-    UserModule
+    UserModule,
+    ProductModule,
+    CategoryModule,
+    TagModule
   ],
   controllers: [AppController],
   providers: [
