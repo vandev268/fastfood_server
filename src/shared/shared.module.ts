@@ -10,9 +10,11 @@ import { APP_GUARD } from '@nestjs/core'
 import { AuthenticationGuard } from './guards/authentication.guard'
 import { SharedRoleRepo } from './repositories/shared-role.repo'
 import { S3Service } from './services/s3.service'
+import { SharedVariantRepo } from './repositories/shared-variant.repo'
+import { SharedTableRepo } from './repositories/shared-table.repo'
 
 const sharedServices = [PrismaService, TokenService, UtilService, OtpService, S3Service]
-const sharedRepositories = [SharedUserRepo, SharedRoleRepo]
+const sharedRepositories = [SharedUserRepo, SharedRoleRepo, SharedVariantRepo, SharedTableRepo]
 
 @Global()
 @Module({

@@ -18,6 +18,8 @@ import { UserModule } from './routes/user/user.module'
 import { ProductModule } from './routes/product/product.module'
 import { CategoryModule } from './routes/category/category.module'
 import { TagModule } from './routes/tag/tag.module'
+import { CartModule } from './routes/cart/cart.module'
+import { TableModule } from './routes/table/table.module'
 
 @Module({
   imports: [
@@ -33,7 +35,9 @@ import { TagModule } from './routes/tag/tag.module'
     UserModule,
     ProductModule,
     CategoryModule,
-    TagModule
+    TagModule,
+    CartModule,
+    TableModule
   ],
   controllers: [AppController],
   providers: [
