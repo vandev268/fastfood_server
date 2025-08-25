@@ -9,9 +9,22 @@ import CustomZodValidationPipe from './shared/pipes/custom-zod-validation.pipe'
 import { HttpExceptionFilter } from './shared/filters/http-exception.filter'
 import { RoleModule } from './routes/role/role.module'
 import { PermissionModule } from './routes/permission/permission.module'
+import { ProvinceModule } from './routes/province/province.module'
+import { DistrictModule } from './routes/district/district.module'
+import { WardModule } from './routes/ward/ward.module'
+import { AddressModule } from './routes/address/address.module'
 
 @Module({
-  imports: [SharedModule, AuthModule, RoleModule, PermissionModule],
+  imports: [
+    SharedModule,
+    AuthModule,
+    RoleModule,
+    PermissionModule,
+    ProvinceModule,
+    DistrictModule,
+    WardModule,
+    AddressModule
+  ],
   controllers: [AppController],
   providers: [
     AppService,
