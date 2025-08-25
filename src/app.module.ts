@@ -20,6 +20,8 @@ import { CategoryModule } from './routes/category/category.module'
 import { TagModule } from './routes/tag/tag.module'
 import { CartModule } from './routes/cart/cart.module'
 import { TableModule } from './routes/table/table.module'
+import { DraftItemModule } from './routes/draft-item/draft-item.module'
+import { ReservationModule } from './routes/reservation/reservation.module'
 
 @Module({
   imports: [
@@ -37,7 +39,9 @@ import { TableModule } from './routes/table/table.module'
     CategoryModule,
     TagModule,
     CartModule,
-    TableModule
+    TableModule,
+    DraftItemModule,
+    ReservationModule
   ],
   controllers: [AppController],
   providers: [

@@ -12,9 +12,18 @@ import { SharedRoleRepo } from './repositories/shared-role.repo'
 import { S3Service } from './services/s3.service'
 import { SharedVariantRepo } from './repositories/shared-variant.repo'
 import { SharedTableRepo } from './repositories/shared-table.repo'
+import { SharedReservationRepo } from './repositories/shared-reservation.repo'
+import { SharedDraftItemRepo } from './repositories/shared-draft-item.repo'
 
 const sharedServices = [PrismaService, TokenService, UtilService, OtpService, S3Service]
-const sharedRepositories = [SharedUserRepo, SharedRoleRepo, SharedVariantRepo, SharedTableRepo]
+const sharedRepositories = [
+  SharedUserRepo,
+  SharedRoleRepo,
+  SharedVariantRepo,
+  SharedTableRepo,
+  SharedReservationRepo,
+  SharedDraftItemRepo
+]
 
 @Global()
 @Module({
