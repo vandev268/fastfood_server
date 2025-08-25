@@ -26,6 +26,9 @@ import { CouponModule } from './routes/coupon/coupon.module'
 import { OrderModule } from './routes/order/order.module'
 import { ReviewModule } from './routes/review/review.module'
 import { ProfileModule } from './routes/profile/profile.module'
+import { RemoveRefreshTokenCronjob } from './cronjobs/remove-refresh-token.cronjob'
+import { RemoveVerificationCodeCronjob } from './cronjobs/remove-verification-code.cronjob'
+import { ScheduleModule } from '@nestjs/schedule'
 
 @Module({
   imports: [
@@ -49,7 +52,8 @@ import { ProfileModule } from './routes/profile/profile.module'
     CouponModule,
     OrderModule,
     ReviewModule,
-    ProfileModule
+    ProfileModule,
+    ScheduleModule.forRoot()
   ],
   controllers: [AppController],
   providers: [
@@ -62,7 +66,9 @@ import { ProfileModule } from './routes/profile/profile.module'
     {
       provide: APP_FILTER,
       useClass: HttpExceptionFilter
-    }
+    },
+    RemoveRefreshTokenCronjob,
+    RemoveVerificationCodeCronjob
   ]
 })
 export class AppModule {}
