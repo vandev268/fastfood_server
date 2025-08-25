@@ -5,7 +5,6 @@ import { DraftItemRepo } from './draft-item.repo'
 
 @Module({
   controllers: [DraftItemController],
-  providers: [DraftItemService, DraftItemRepo],
-  exports: [DraftItemService]
+  providers: [DraftItemService, DraftItemRepo]
 })
 export class DraftItemModule {}

@@ -30,7 +30,14 @@ const configSchema = z.object({
   AWS_S3_BUCKET_NAME: z.string(),
   AWS_S3_REGION: z.string(),
   AWS_S3_ACCESS_KEY_ID: z.string(),
-  AWS_S3_SECRET_KEY: z.string()
+  AWS_S3_SECRET_KEY: z.string(),
+  VNPAY_TMN_CODE: z.string(),
+  VNPAY_HASH_SECRET: z.string(),
+  VNPAY_URL: z.string(),
+  VNPAY_REDIRECT_URL: z.string(),
+  MOMO_ACCESS_KEY: z.string(),
+  MOMO_SECRET_KEY: z.string(),
+  MOMO_REDIRECT_URL: z.string()
 })
 
 const parsedConfig = configSchema.safeParse(process.env)

@@ -22,6 +22,8 @@ import { CartModule } from './routes/cart/cart.module'
 import { TableModule } from './routes/table/table.module'
 import { DraftItemModule } from './routes/draft-item/draft-item.module'
 import { ReservationModule } from './routes/reservation/reservation.module'
+import { CouponModule } from './routes/coupon/coupon.module'
+import { OrderModule } from './routes/order/order.module'
 
 @Module({
   imports: [
@@ -41,7 +43,9 @@ import { ReservationModule } from './routes/reservation/reservation.module'
     CartModule,
     TableModule,
     DraftItemModule,
-    ReservationModule
+    ReservationModule,
+    CouponModule,
+    OrderModule
   ],
   controllers: [AppController],
   providers: [

@@ -24,3 +24,8 @@ export const generateRandomFilename = (filename: string) => {
   const ext = extname(filename)
   return `${uuidv4()}${ext}`
 }
+
+export const getOrderIdByPaymentInfo = (orderInfo: string) => {
+  const orderId = orderInfo.split('#')[1]
+  return Number(orderId)
+}

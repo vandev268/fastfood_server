@@ -14,20 +14,27 @@ import { SharedVariantRepo } from './repositories/shared-variant.repo'
 import { SharedTableRepo } from './repositories/shared-table.repo'
 import { SharedReservationRepo } from './repositories/shared-reservation.repo'
 import { SharedDraftItemRepo } from './repositories/shared-draft-item.repo'
+import { MomoService } from './services/momo.service'
+import { SharedCouponRepo } from './repositories/shared-coupon.repo'
+import { SharedOrderRepo } from './repositories/shared-order.repo'
+import { HttpModule } from '@nestjs/axios'
+import { VNPayService } from './services/vnpay.service'
 
-const sharedServices = [PrismaService, TokenService, UtilService, OtpService, S3Service]
+const sharedServices = [PrismaService, TokenService, UtilService, OtpService, S3Service, MomoService, VNPayService]
 const sharedRepositories = [
   SharedUserRepo,
   SharedRoleRepo,
   SharedVariantRepo,
   SharedTableRepo,
   SharedReservationRepo,
-  SharedDraftItemRepo
+  SharedDraftItemRepo,
+  SharedCouponRepo,
+  SharedOrderRepo
 ]
 
 @Global()
 @Module({
-  imports: [JwtModule],
+  imports: [JwtModule, HttpModule],
   exports: [...sharedServices, ...sharedRepositories],
   providers: [
     ...sharedServices,
