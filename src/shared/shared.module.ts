@@ -19,8 +19,20 @@ import { SharedCouponRepo } from './repositories/shared-coupon.repo'
 import { SharedOrderRepo } from './repositories/shared-order.repo'
 import { HttpModule } from '@nestjs/axios'
 import { VNPayService } from './services/vnpay.service'
+import { CommonRecommendationService } from './services/ml/common-recommendation.service'
+import { ContentBasedRecommendationService } from './services/ml/content-based-recommendation.service'
 
-const sharedServices = [PrismaService, TokenService, UtilService, OtpService, S3Service, MomoService, VNPayService]
+const sharedServices = [
+  PrismaService,
+  TokenService,
+  UtilService,
+  OtpService,
+  S3Service,
+  MomoService,
+  VNPayService,
+  CommonRecommendationService,
+  ContentBasedRecommendationService
+]
 const sharedRepositories = [
   SharedUserRepo,
   SharedRoleRepo,

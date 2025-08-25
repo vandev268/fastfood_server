@@ -35,6 +35,7 @@ import { OrderConsumer } from './consumers/order.consumer'
 import { WebsocketModule } from './websockets/websocket.module'
 import { StatisticsModule } from './routes/statistics/statistics.module'
 import { PaymentModule } from './routes/payment/payment.module'
+import { RecommendationModule } from './routes/recommendation/recommendation.module'
 
 @Module({
   imports: [
@@ -72,7 +73,8 @@ import { PaymentModule } from './routes/payment/payment.module'
     }),
     OrderConsumer,
     WebsocketModule,
-    StatisticsModule
+    StatisticsModule,
+    RecommendationModule
   ],
   controllers: [AppController],
   providers: [
