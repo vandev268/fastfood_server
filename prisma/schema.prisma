@@ -32,6 +32,9 @@ model User {
   addresses                   Address[]
   carts                       CartItem[]
   reservations                Reservation[]
+  reviews                     Review[]
+  orders                      Order[]
+  handledOrders              Order[] @relation("OrderHandler")
 
   deletedAt DateTime?
   createdAt DateTime  @default(now())
@@ -110,6 +113,8 @@ model Address {
   deliveryNote    String   @default("")
   isDefault       Boolean  @default(false)
 
+  orders          Order[]
+
   deletedAt DateTime?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -162,9 +167,12 @@ model Product {
   status        ProductStatus @default(Pending)
   /// [ProductVariants]
   variantsConfig Json
+
   categories    Category[]
   tags          Tag[]
   variants      Variant[]
+  reviews       Review[]
+  orderItems    OrderItem[]
 
   deletedAt DateTime?
   createdAt     DateTime @default(now())
@@ -184,6 +192,7 @@ model Variant {
 
   cartItems  CartItem[]
   draftItems DraftItem[]
+  orderItems OrderItem[]
 
   deletedAt DateTime?
   createdAt DateTime  @default(now())
@@ -244,8 +253,10 @@ model Table {
   capacity  Int
   status    TableStatus @default(Available)
   location  TableLocation
+
   draftItems DraftItem[]
   reservations Reservation[]
+  orders      Order[]
 
   deletedAt DateTime?
   createdAt DateTime    @default(now())
@@ -282,10 +293,115 @@ model Reservation {
   tableId         Int
   table           Table         @relation(fields: [tableId], references: [id], onDelete: Cascade, onUpdate: NoAction)
 
+  orders          Order[]
+
   deletedAt DateTime?
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
 
+  @@index([deletedAt])
+}
+
+model Coupon {
+  id                  Int      @id @default(autoincrement())
+  code                String   @db.VarChar(500)
+  description         String   @default("")
+  discountType        CouponDiscountType
+  discountValue       Float
+  minOrderAmount      Float    @default(0)
+  usageLimit          Int      @default(0)
+  isActive            Boolean  @default(true)
+  orders              Order[]
+  expiresAt DateTime?
+
+  deletedAt DateTime?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([deletedAt])
+}
+
+model Order {
+  id                Int       @id @default(autoincrement())
+  // Type sẽ được sử dụng để phân biệt giữa các loại đơn hàng như giao hàng, ăn tại chỗ
+  orderType         OrderType
+  customerName         String    @db.VarChar(500) @default("")
+  // Thông tin người dùng cho đơn giao hàng
+  userId            Int?
+  user              User?     @relation(fields: [userId], references: [id], onDelete: SetNull, onUpdate: NoAction)
+  deliveryAddressId Int?
+  deliveryAddress   Address?  @relation(fields: [deliveryAddressId], references: [id], onDelete: SetNull, onUpdate: NoAction)
+  // Thông tin bàn ăn
+  // - Một order có thể sử dụng nhiều bàn (ghép bàn)
+  // - Nhưng một bàn tại một thời điểm chỉ phục vụ một order
+  tables           Table[]
+  // - Thông tin nếu đơn hàng là đặt bàn trước (table + reservation)
+  // - One-to-One: Một order chỉ thuộc về một reservation
+  reservationId     Int?
+  reservation       Reservation? @relation(fields: [reservationId], references: [id], onDelete: SetNull, onUpdate: NoAction)
+
+  couponId          Int?
+  coupon            Coupon?   @relation(fields: [couponId], references: [id], onDelete: SetNull, onUpdate: NoAction)
+  totalAmount       Float
+  feeAmount         Float      @default(0)
+  discountAmount    Float      @default(0)
+  finalAmount       Float
+  payment           Json
+  note              String      @default("")
+  status            OrderStatus
+  handlerId         Int?
+  handler           User?       @relation("OrderHandler", fields: [handlerId], references: [id], onDelete: SetNull, onUpdate: NoAction)
+  orderItems OrderItem[]
+  reviews    Review[]
+
+  deletedAt DateTime?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  @@index([deletedAt])
+  // GIẢI PHÁP CHO SOFT DELETE + UNIQUE CONSTRAINT:
+  // 1. Giữ @unique cho Prisma relation
+  // 2. Xử lý conflict bằng application logic khi restore soft-deleted orders
+  // 3. Hoặc tạo custom migration để thay bằng partial unique index
+}
+
+model OrderItem {
+  id               Int      @id @default(autoincrement())
+  productName      String   @db.VarChar(500)
+  thumbnail        String
+  variantValue     String
+  quantity         Int
+  price            Float
+  orderId          Int
+  order            Order    @relation(fields: [orderId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  productId        Int?
+  product          Product?  @relation(fields: [productId], references: [id], onDelete: SetNull, onUpdate: NoAction)
+  variantId        Int?
+  variant          Variant? @relation(fields: [variantId], references: [id], onDelete: SetNull, onUpdate: NoAction)
+
+  createdAt DateTime @default(now())
+
+  @@index([orderId])
+}
+
+model Review {
+  id        Int     @id @default(autoincrement())
+  content   String  @default("")
+  rating    Float
+  isEdited  Boolean @default(false)
+  userId    Int
+  user      User    @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  productId Int
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  orderId   Int
+  order     Order   @relation(fields: [orderId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  deletedAt DateTime?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([productId])
+  @@index([userId])
   @@index([deletedAt])
 }
 
@@ -362,4 +478,41 @@ enum ReservationStatus {
   Arrived
   Completed
   Cancelled
+}
+
+enum CouponDiscountType {
+  Percent
+  Amount
+}
+
+enum OrderType {
+  Delivery
+  DineIn
+  Takeaway
+}
+
+enum OrderStatus {
+  Pending
+  Confirmed
+  Preparing
+  Ready
+  OutForDelivery
+  Served
+  Completed
+  Cancelled
+  CancelledByKitchen
+}
+
+enum PaymentMethod {
+  Cash
+  MOMO
+  VNPay
+  COD
+}
+
+enum PaymentStatus {
+  Pending
+  Succeeded
+  Failed
+  Refunded
 }
