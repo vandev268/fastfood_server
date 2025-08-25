@@ -6,6 +6,9 @@
   "private": true,
   "license": "UNLICENSED",
   "scripts": {
+    "test-scripts": "ts-node initSeedData/test.ts",
+    "create:base-data": "ts-node initSeedData/create-base-data.ts",
+    "create:permissions": "ts-node initSeedData/create-permissions.ts",
     "build": "nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "nest start",
