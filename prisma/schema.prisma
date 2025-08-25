@@ -153,6 +153,7 @@ model Product {
   description   String        @default("")
   images        String[]
   status        ProductStatus @default(Pending)
+  /// [ProductVariants]
   variantsConfig Json
   categories    Category[]
   tags          Tag[]
