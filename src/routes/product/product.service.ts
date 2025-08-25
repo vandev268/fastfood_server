@@ -68,7 +68,7 @@ export class ProductService {
   }
 
   async update({ productId, data }: { productId: number; data: UpdateProductBodyType }) {
-    const { id, images } = await this.verifyProductExists({ productId })
+    const { id, images, orderItems } = await this.verifyProductExists({ productId })
     try {
       const basePrice = data.variants.reduce((min, variant) => Math.min(min, variant.price), Infinity)
       const product = await this.productRepo.update({ where: { id }, data: { ...data, basePrice } })
@@ -77,8 +77,11 @@ export class ProductService {
         // 1. Lấy danh sách ảnh cũ không còn trong images mới
         const oldImages = images.filter((image) => !product.images.includes(image))
 
-        if (oldImages.length > 0) {
-          await this.s3Service.deleteFiles(oldImages)
+        // 2. Lấy danh sách ảnh cần xóa. Danh sách ảnh củ loại bỏ các ảnh thumbnail trong order items
+        const imagesToDelete = oldImages.filter((image) => !orderItems.some((item) => item.thumbnail === image))
+
+        if (imagesToDelete.length > 0) {
+          await this.s3Service.deleteFiles(imagesToDelete)
         }
       }
       return product
@@ -100,10 +103,13 @@ export class ProductService {
   }
 
   async delete(productId: number) {
-    const { id, images } = await this.verifyProductExists({ productId })
+    const { id, images, orderItems } = await this.verifyProductExists({ productId })
     await this.productRepo.delete({ id })
     if (envConfig.DELETE_MODE !== DeleteMode && images && images.length > 0) {
-      await this.s3Service.deleteFiles(images)
+      // Lấy danh sách ảnh cần xóa. Danh sách ảnh củ loại bỏ các ảnh thumbnail trong order items
+      const imagesToDelete = images.filter((image) => !orderItems.some((item) => item.thumbnail === image))
+
+      await this.s3Service.deleteFiles(imagesToDelete)
     }
     return { message: 'Product deleted successfully' }
   }

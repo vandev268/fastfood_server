@@ -13,10 +13,15 @@ import {
 } from './reservation.dto'
 import { PaginationQueryDTO } from 'src/shared/dtos/request.dto'
 import { Public } from 'src/shared/decorators/auth.decorator'
+import { ReservationGateway } from 'src/websockets/reservation.gateway'
+import { Room } from 'src/shared/constants/websocket.constant'
 
 @Controller('reservations')
 export class ReservationController {
-  constructor(private readonly reservationService: ReservationService) {}
+  constructor(
+    private readonly reservationService: ReservationService,
+    private readonly reservationGateway: ReservationGateway
+  ) {}
 
   @Get()
   @ZodSerializerDto(GetReservationsResDTO)
@@ -40,18 +45,27 @@ export class ReservationController {
   @Public()
   @ZodSerializerDto(MessageResDTO)
   create(@Body() body: CreateReservationBodyDTO) {
+    this.reservationGateway.server.to(Room.Reservation).emit('received-reservation', {
+      message: 'New reservation created'
+    })
     return this.reservationService.create(body)
   }
 
   @Put(':reservationId')
   @ZodSerializerDto(MessageResDTO)
   update(@Param() params: ReservationParamsDTO, @Body() body: UpdateReservationBodyDTO) {
+    this.reservationGateway.server.to(Room.Reservation).emit('updated-reservation', {
+      message: 'Reservation updated'
+    })
     return this.reservationService.update({ reservationId: params.reservationId, data: body })
   }
 
   @Patch(':reservationId/change-status')
   @ZodSerializerDto(MessageResDTO)
   changeStatus(@Param() params: ReservationParamsDTO, @Body() body: ChangeReservationStatusBodyDTO) {
+    this.reservationGateway.server.to(Room.Reservation).emit('changed-reservation-status', {
+      message: 'Reservation status changed'
+    })
     return this.reservationService.changeStatus({ reservationId: params.reservationId, data: body })
   }
 }

@@ -14,11 +14,17 @@ import {
 import { Response } from 'express'
 import envConfig from 'src/shared/config'
 import { ZodSerializerDto } from 'nestjs-zod'
+import { Room } from 'src/shared/constants/websocket.constant'
+import { PaymentStatus } from 'src/shared/constants/payment.constant'
+import { OrderGateway } from 'src/websockets/order.gateway'
 
 @Controller('payment')
 @Public()
 export class PaymentController {
-  constructor(private readonly paymentService: PaymentService) {}
+  constructor(
+    private readonly paymentService: PaymentService,
+    private readonly orderGateway: OrderGateway
+  ) {}
 
   @Post('create-link')
   @ZodSerializerDto(GetPaymentLinkResDTO)
@@ -29,12 +35,18 @@ export class PaymentController {
   @Get('vnpay/callback')
   async vnpayPaymentCallback(@Query() query: VNPayPaymentCallbackQueryDTO, @Res() res: Response) {
     const { orderId, status } = await this.paymentService.handleVNPayCallback(query)
+    this.orderGateway.server.to(Room.Manage).emit('changed-order-status', {
+      message: `Payment ${status === PaymentStatus.Succeeded ? 'confirmed' : 'failed'} for order #${orderId}`
+    })
     return res.redirect(`${envConfig.CLIENT_REDIRECT_URI}/payment-callback?status=${status}&orderId=${orderId}`)
   }
 
   @Get('momo/callback')
   async momoPaymentCallback(@Query() query: MomoPaymentCallbackQueryDTO, @Res() res: Response) {
     const { orderId, status } = await this.paymentService.handleMomoCallback(query)
+    this.orderGateway.server.to(Room.Manage).emit('changed-order-status', {
+      message: `Payment ${status === PaymentStatus.Succeeded ? 'confirmed' : 'failed'} for order #${orderId}`
+    })
     return res.redirect(`${envConfig.CLIENT_REDIRECT_URI}/payment-callback?status=${status}&orderId=${orderId}`)
   }
 

@@ -3,6 +3,7 @@ import { OrderBy, SortBy } from 'src/shared/constants/common.constant'
 import { PaginationQuerySchema } from 'src/shared/models/request.model'
 import { CategorySchema } from 'src/shared/models/shared-category.model'
 import { ProductSchema, ProductVariantsType, VariantSchema } from 'src/shared/models/shared-product.model'
+import { ReviewDetailSchema } from 'src/shared/models/shared-review.model'
 import { TagSchema } from 'src/shared/models/shared-tag.model'
 
 export const GetVariantsResSchema = z.object({
@@ -34,7 +35,8 @@ function generateVariants(variants: ProductVariantsType) {
 export const ProductDetailSchema = ProductSchema.extend({
   variants: z.array(VariantSchema),
   categories: z.array(CategorySchema),
-  tags: z.array(TagSchema)
+  tags: z.array(TagSchema),
+  reviews: z.array(ReviewDetailSchema)
 })
 
 export const ProductQuerySchema = PaginationQuerySchema.extend({
@@ -62,7 +64,7 @@ export const ProductQuerySchema = PaginationQuerySchema.extend({
 })
 
 export const GetProductsResSchema = z.object({
-  data: z.array(ProductDetailSchema),
+  data: z.array(ProductDetailSchema.omit({ reviews: true })),
   totalItems: z.number(),
   page: z.number(),
   limit: z.number(),

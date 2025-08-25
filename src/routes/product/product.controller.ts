@@ -13,12 +13,17 @@ import {
 } from './product.dto'
 import { ZodSerializerDto } from 'nestjs-zod'
 import { MessageResDTO } from 'src/shared/dtos/response.dto'
+import { Room } from 'src/shared/constants/websocket.constant'
+import { ProductGateway } from 'src/websockets/product.gateway'
 import { ProductService } from './product.service'
 import { Public } from 'src/shared/decorators/auth.decorator'
 
 @Controller('products')
 export class ProductController {
-  constructor(private readonly productService: ProductService) {}
+  constructor(
+    private readonly productService: ProductService,
+    private readonly productGateway: ProductGateway
+  ) {}
 
   @Get()
   @Public()
@@ -51,24 +56,36 @@ export class ProductController {
   @Post()
   @ZodSerializerDto(ProductResDTO)
   create(@Body() body: CreateProductBodyDTO) {
+    this.productGateway.server.to(Room.Product).emit('sended-product', {
+      message: 'A new product has been created'
+    })
     return this.productService.create(body)
   }
 
   @Put(':productId')
   @ZodSerializerDto(ProductResDTO)
   update(@Param() params: ProductParamsDTO, @Body() body: UpdateProductBodyDTO) {
+    this.productGateway.server.to(Room.Product).emit('updated-product', {
+      message: 'A product has been updated'
+    })
     return this.productService.update({ productId: params.productId, data: body })
   }
 
   @Patch(':productId/change-status')
   @ZodSerializerDto(MessageResDTO)
   changeStatus(@Param() params: ProductParamsDTO, @Body() body: ChangeProductStatusBodyDTO) {
+    this.productGateway.server.to(Room.Product).emit('updated-product', {
+      message: `A product status has been changed`
+    })
     return this.productService.changeStatus({ productId: params.productId, data: body })
   }
 
   @Delete(':productId')
   @ZodSerializerDto(MessageResDTO)
   delete(@Param() params: ProductParamsDTO) {
+    this.productGateway.server.to(Room.Product).emit('sended-product', {
+      message: 'A product has been deleted'
+    })
     return this.productService.delete(params.productId)
   }
 }

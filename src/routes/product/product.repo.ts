@@ -68,6 +68,12 @@ export class ProductRepo {
       caculatedOrderBy = {
         basePrice: orderBy
       }
+    } else if (sortBy === SortBy.Sale) {
+      caculatedOrderBy = {
+        orderItems: {
+          _count: orderBy
+        }
+      }
     }
     const [products, totalItems] = await Promise.all([
       this.prismaService.product.findMany({
@@ -157,6 +163,21 @@ export class ProductRepo {
           where: {
             deletedAt: null
           }
+        },
+        reviews: {
+          where: {
+            deletedAt: null
+          },
+          include: {
+            user: {
+              select: {
+                id: true,
+                name: true,
+                email: true,
+                avatar: true
+              }
+            }
+          }
         }
       }
     })
@@ -164,7 +185,10 @@ export class ProductRepo {
 
   async findWithOrderItems(where: Prisma.ProductWhereUniqueInput) {
     return await this.prismaService.product.findUnique({
-      where
+      where,
+      include: {
+        orderItems: true
+      }
     })
   }
 

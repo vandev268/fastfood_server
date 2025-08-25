@@ -13,10 +13,15 @@ import {
 import { ZodSerializerDto } from 'nestjs-zod'
 import { UserActive } from 'src/shared/decorators/user-active.decorator'
 import { MessageResDTO } from 'src/shared/dtos/response.dto'
+import { ReviewGateway } from 'src/websockets/review.gateway'
+import { Room } from 'src/shared/constants/websocket.constant'
 
 @Controller('reviews')
 export class ReviewController {
-  constructor(private readonly reviewService: ReviewService) {}
+  constructor(
+    private readonly reviewService: ReviewService,
+    private readonly reviewGateway: ReviewGateway
+  ) {}
 
   @Get('list')
   @ZodSerializerDto(GetReviewsResDTO)
@@ -40,6 +45,9 @@ export class ReviewController {
   @ZodSerializerDto(ReviewResDTO)
   async create(@UserActive('id') userId: number, @Body() body: CreateReviewBodyDTO) {
     const result = await this.reviewService.create({ userId, data: body })
+    this.reviewGateway.server.to(Room.Review).emit('recieved-review', {
+      message: 'Server received a new review'
+    })
     return result
   }
 
@@ -47,6 +55,9 @@ export class ReviewController {
   @ZodSerializerDto(ReviewResDTO)
   async update(@UserActive('id') userId: number, @Param() params: ReviewParamsDTO, @Body() body: UpdateReviewBodyDTO) {
     const result = await this.reviewService.update({ userId, reviewId: params.reviewId, data: body })
+    this.reviewGateway.server.to(Room.Review).emit('recieved-review', {
+      message: 'Server received an updated review'
+    })
     return result
   }
 
@@ -54,6 +65,9 @@ export class ReviewController {
   @ZodSerializerDto(MessageResDTO)
   async delete(@UserActive('id') userId: number, @Param() params: ReviewParamsDTO) {
     const result = await this.reviewService.delete({ reviewId: params.reviewId, userId })
+    this.reviewGateway.server.to(Room.Review).emit('recieved-review', {
+      message: 'Server received a deleted review'
+    })
     return result
   }
 }

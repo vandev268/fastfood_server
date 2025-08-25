@@ -16,6 +16,10 @@ export class TableRepo {
     const [tables, totalItems] = await Promise.all([
       this.prismaService.table.findMany({
         where,
+        include: {
+          orders: true,
+          reservations: true
+        },
         skip,
         take: limit,
         orderBy: { createdAt: 'desc' }
@@ -35,6 +39,10 @@ export class TableRepo {
   async findAll(where: Prisma.TableWhereInput) {
     const tables = await this.prismaService.table.findMany({
       where,
+      include: {
+        orders: true,
+        reservations: true
+      },
       orderBy: { createdAt: 'desc' }
     })
     return {
@@ -51,7 +59,11 @@ export class TableRepo {
 
   async findDetail(where: Prisma.TableWhereUniqueInput) {
     return await this.prismaService.table.findUnique({
-      where
+      where,
+      include: {
+        orders: true,
+        reservations: true
+      }
     })
   }
 

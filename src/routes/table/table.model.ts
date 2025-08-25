@@ -1,7 +1,12 @@
 import { z } from 'zod'
+import { OrderSchema } from 'src/shared/models/shared-order.model'
 import { TableSchema } from 'src/shared/models/shared-table.model'
+import { ReservationSchema } from 'src/shared/models/shared-reservation.model'
 
-export const TableDetailSchema = TableSchema
+export const TableDetailSchema = TableSchema.extend({
+  reservations: z.array(ReservationSchema),
+  orders: z.array(OrderSchema)
+})
 
 export const TableParamsSchema = z.object({
   tableId: z.coerce.number().int().positive()
